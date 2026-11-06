@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#87ceeb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="小六數學" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="description" content="香港小六數學競技場——小數四則、分數四則、平均數、面積、體積、代數、方程、文字題；隨機出題、限時計分、雙人對賽。" />
+  <title>小六數學競技場</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="ipad-ready">
+  <div class="app">
+    <!-- HOME -->
+    <section id="screen-home" class="screen active" aria-label="主頁">
+      <header class="header">
+        <div class="logo">
+          <div class="logo-badge" aria-hidden="true">六</div>
+          <div>
+            <h1>小六數學競技場</h1>
+            <p>香港小學課程 · 隨機出題 · 限時計分</p>
+          </div>
+        </div>
+        <button type="button" class="icon-btn" id="btn-mute" aria-pressed="false">🔊 音效</button>
+      </header>
+
+      <div id="home-art"></div>
+
+      <div class="card">
+        <h2 class="section-title">選擇課題</h2>
+        <div class="topic-grid" role="group" aria-label="課題">
+          <button type="button" class="topic-btn" data-topic="decimal"><span class="icon-slot" data-icon="decimal"></span><span class="name">小數四則</span></button>
+          <button type="button" class="topic-btn" data-topic="fraction"><span class="icon-slot" data-icon="fraction"></span><span class="name">分數四則</span></button>
+          <button type="button" class="topic-btn" data-topic="average"><span class="icon-slot" data-icon="average"></span><span class="name">平均數</span></button>
+          <button type="button" class="topic-btn" data-topic="area"><span class="icon-slot" data-icon="area"></span><span class="name">面積</span></button>
+          <button type="button" class="topic-btn" data-topic="volume"><span class="icon-slot" data-icon="volume"></span><span class="name">體積</span></button>
+          <button type="button" class="topic-btn" data-topic="algebra"><span class="icon-slot" data-icon="algebra"></span><span class="name">代數</span></button>
+          <button type="button" class="topic-btn" data-topic="equation"><span class="icon-slot" data-icon="equation"></span><span class="name">方程</span></button>
+          <button type="button" class="topic-btn" data-topic="word"><span class="icon-slot" data-icon="word"></span><span class="name">文字題</span></button>
+          <button type="button" class="topic-btn mixed selected" data-topic="mixed"><span class="icon-slot" data-icon="mixed"></span><span class="name">綜合挑戰（全部課題混合）</span></button>
+        </div>
+
+        <h2 class="section-title">模式</h2>
+        <div class="row">
+          <div class="chip-group" role="group" aria-label="模式">
+            <button type="button" class="chip selected" data-mode="solo">單人練習</button>
+            <button type="button" class="chip" data-mode="versus">雙人對賽</button>
+          </div>
+        </div>
+
+        <h2 class="section-title">難度</h2>
+        <div class="row">
+          <div class="chip-group" role="group" aria-label="難度">
+            <button type="button" class="chip" data-diff="easy">簡易</button>
+            <button type="button" class="chip selected" data-diff="normal">普通</button>
+            <button type="button" class="chip" data-diff="hard">挑戰</button>
+          </div>
+        </div>
+
+        <div class="row actions">
+          <button type="button" class="btn btn-primary" id="btn-start">開始遊戲 ▶</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1rem">
+        <h2 class="section-title">本機最佳成績</h2>
+        <ul class="best-list" id="best-scores"></ul>
+        <p class="home-footer" id="last-session"></p>
+        <button type="button" class="btn btn-ghost" id="btn-reset-progress" style="margin-top:.75rem;font-size:.85rem">清除進度</button>
+      </div>
+
+      <p class="home-footer">
+        跟隨「聰明鳥」闖關：答對就跑、跳、飛！分數上下堆疊顯示。題目每次隨機生成。純靜態頁，可用本機伺服器開啟；進度存於 localStorage。
+      </p>
+    </section>
+
+    <!-- PLAY -->
+    <section id="screen-play" class="screen" aria-label="遊戲中">
+      <!-- Solo layout -->
+      <div id="solo-play" class="solo-play">
+        <header class="header">
+          <div class="logo">
+            <div class="logo-badge" aria-hidden="true">六</div>
+            <div>
+              <h1 style="font-size:1.1rem">作答中</h1>
+              <p>專心諗，快啲答！</p>
+            </div>
+          </div>
+          <button type="button" class="icon-btn" id="btn-quit">退出</button>
+        </header>
+
+        <div class="stats-bar">
+          <div class="stat warn"><div class="label">剩餘時間</div><div class="value" id="hud-time">2:00</div></div>
+          <div class="stat good"><div class="label">目前得分</div><div class="value" id="hud-score">0</div></div>
+          <div class="stat"><div class="label">題目</div><div class="value" id="hud-qnum">1 / 10</div></div>
+        </div>
+
+        <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
+        <div id="adventure-root" class="adventure-root" aria-live="polite"></div>
+
+        <div class="card question-card" id="question-card">
+          <div class="q-meta">
+            <span id="q-topic">課題</span>
+            <span id="q-type">題型</span>
+          </div>
+          <div id="q-body"></div>
+          <div class="answer-area" id="answer-area"></div>
+          <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <!-- Versus opposite-seating: top (A, rotated 180°) | center bird | bottom (B) -->
+      <div id="versus-play" class="versus-play" hidden>
+        <div class="vs-top vs-panel" id="vs-panel-a">
+          <div class="vs-panel-inner">
+            <div class="vs-panel-hud">
+              <span class="vs-name vs-name-a">玩家 A</span>
+              <span class="vs-score" id="vs-score-a">0</span>
+              <span class="vs-qmeta"><span id="vs-topic-a">課題</span> · <span id="vs-time-a">2:00</span></span>
+            </div>
+            <div class="vs-qbody" id="vs-qbody-a"></div>
+            <div class="vs-answer" id="vs-answer-a"></div>
+            <div class="vs-feedback" id="vs-feedback-a" role="status"></div>
+          </div>
+        </div>
+
+        <div class="vs-mid" id="vs-mid">
+          <button type="button" class="icon-btn vs-quit" id="btn-quit-vs" title="退出">退出</button>
+          <div id="vs-center-root" class="vs-center-root"></div>
+          <div class="vs-mid-hint">同一題 · 搶答！誰先答對就過題</div>
+          <button type="button" class="btn btn-primary vs-next-btn" id="btn-vs-next" hidden>下一題 →</button>
+        </div>
+
+        <div class="vs-bottom vs-panel" id="vs-panel-b">
+          <div class="vs-panel-inner">
+            <div class="vs-panel-hud">
+              <span class="vs-name vs-name-b">玩家 B</span>
+              <span class="vs-score" id="vs-score-b">0</span>
+              <span class="vs-qmeta"><span id="vs-topic-b">課題</span> · <span id="vs-time-b">2:00</span> · <span id="vs-qnum">1/10</span></span>
+            </div>
+            <div class="vs-qbody" id="vs-qbody-b"></div>
+            <div class="vs-answer" id="vs-answer-b"></div>
+            <div class="vs-feedback" id="vs-feedback-b" role="status"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- END -->
+    <section id="screen-end" class="screen" aria-label="結算">
+      <header class="header">
+        <div class="logo">
+          <div class="logo-badge" aria-hidden="true">六</div>
+          <div>
+            <h1 style="font-size:1.1rem">本局結束</h1>
+            <p id="end-topic">—</p>
+          </div>
+        </div>
+      </header>
+      <div class="card">
+        <div id="end-body"></div>
+        <div class="row actions" style="margin-top:1.25rem;gap:.75rem">
+          <button type="button" class="btn btn-primary" id="btn-rematch">再來一局</button>
+          <button type="button" class="btn btn-ghost" id="btn-home">返回主頁</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/fractions.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/diagrams.js"></script>
+  <script src="js/adventure.js"></script>
+  <script src="js/scratchpad.js"></script>
+  <script src="js/generators/decimal-division.js"></script>
+  <script src="js/generators/fractions-ops.js"></script>
+  <script src="js/generators/average.js"></script>
+  <script src="js/generators/area.js"></script>
+  <script src="js/generators/volume.js"></script>
+  <script src="js/generators/algebra.js"></script>
+  <script src="js/generators/equations.js"></script>
+  <script src="js/generators/word-problems.js"></script>
+  <script src="js/generators/index.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
